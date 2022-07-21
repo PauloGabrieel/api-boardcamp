@@ -1,10 +1,9 @@
 import connection from "../database/postgres.js";
 
-async function getCategories(req, res){
+export async function getCategories(req, res){
 
     const categories = await connection.query('SELECT * FROM categories');
-    console.log(categories);
+    res.send(categories.rows)
 
 };
 
-export default {getCategories};
