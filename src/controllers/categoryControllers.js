@@ -13,15 +13,18 @@ export async function getCategories(req, res){
     
 };
 export async function createCategory(req, res){
-    const {name} = req.body;
-   try {
+    
+    try {
+        const {name} = req.body;
         const validation =  await categoryValidation(name);
         if(validation.error){
             return res.status(400).send("nome da categoria é obrigatório");
         };
         
-        const categoryAlreadyExists = await connection.query(`SELECT name FROM categories WHERE name='${name}';`);
-        if(categoryAlreadyExists.rows){
+        const category = await connection.query(`SELECT name FROM categories WHERE name='${name}';`);
+        const CategoryAlreadyExists = category.rows[0];
+    
+        if(CategoryAlreadyExists){
          return res.status(409).send('Categoria já existente');   
         };
         
