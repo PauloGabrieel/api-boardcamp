@@ -22,4 +22,22 @@ export async function createCustomer(req, res){
         console.log(error);
         res.status(500).send('Houve um erro na criação do cliente');
     };
+};
+
+export async function getCustomers(req, res){
+    try {
+        const {cpf} = req.query
+        if(cpf){
+            const customer = await connection.query(`SELECT * FROM customers WHERE cpf LIKE '${cpf+"%"}';`);
+            return res.status(200).send(customer.rows);
+        };
+        
+        const customers = await connection.query('SELECT * FROM customers;');
+        res.status(200).send(customers.rows);    
+    } catch (error) {
+        
+    }
+
+
+    
 }
