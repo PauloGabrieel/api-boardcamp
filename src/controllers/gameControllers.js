@@ -3,10 +3,26 @@ import { gameValidation } from "../schemas/gameSchema.js";
 
 export async function getGames(req, res){
     try {
-        
+        const {name} = req.query;   
+        if(name){
+            const nameUpperCase = name[0].toUpperCase() + name.substring(1);
+            const gamesAvailable = await connection.query(`
+                SELECT g.*, c.name as "categoryName"
+                FROM games g JOIN categories c
+                ON g."categoryId"=c.id WHERE g.name LIKE '${nameUpperCase+"%"}';
+            `);
+            return res.status(200).send(gamesAvailable.rows);
+        };
+        const gamesAvailable = await connection.query(`
+            SELECT g.*,c.name as "categoryName" 
+            FROM games g JOIN categories c 
+            ON g."categoryId"=c.id;
+        `);
+        res.status(200).send(gamesAvailable.rows);
     } catch (error) {
         console.log(error);
-    }
+        res.status(500).send('Houve algum erro ao buscar os jogos no banco de dados');
+    };
 };
 export async function creategame(req,res){
     try {
@@ -31,5 +47,6 @@ export async function creategame(req,res){
         res.status(201).send('jogo cadastrado');  
     } catch (error) {
         console.log(error);
-    }
+        res.status(500);
+    };
 };
