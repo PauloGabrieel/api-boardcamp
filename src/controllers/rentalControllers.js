@@ -30,8 +30,17 @@ export async function createRental(req,res){
 
 export async function getRentals(req,res){
     try {
-        const data = await connection.query(`SELECT rentals.*, row_to_json(customers) AS customer, row_to_json(games) AS game 
-        FROM rentals JOIN customers ON rentals."customerId"=customers.id JOIN games ON rentals."gameId"=games.id;`);
+        const data = await connection.query(`
+            SELECT rentals.*, 
+            row_to_json(customers) AS customer, 
+            row_to_json(games) AS game 
+            FROM rentals 
+            JOIN (SELECT id, name FROM customers )customers 
+            ON rentals."customerId"=customers.id 
+            JOIN (SELECT g.id, g.name, g."categoryId", c.name AS "categoryName" 
+            FROM games g JOIN categories c 
+            ON g."categoryId"=c.id) games ON rentals."gameId"=games.id;`);
+        
         res.send(data.rows);
     } catch (error) {
         console.log(error);
