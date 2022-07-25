@@ -35,9 +35,23 @@ export async function getCustomers(req, res){
         const customers = await connection.query('SELECT * FROM customers;');
         res.status(200).send(customers.rows);    
     } catch (error) {
-        
-    }
+        console.log(error);
+        res.status(500).send('Houve um problema para buscar os clientes');   
+    };
+};
 
-
+export async function getCustomersById(req, res){
+    try {
+        const {id} = req.params;
+        const customer = await connection.query(`SELECT * FROM customers WHERE id='${id}'`);
+        const existingCustomer = customer.rows.length !== 0;
     
-}
+        if(!existingCustomer){
+            return res.status(404).send('Cliente não existe');
+        };
+        res.status(200).send(customer.rows);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Houve um problema para buscar o cliente');
+    }
+};
