@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { createRental } from "../controllers/rentalControllers.js";
+import { createRental, getRentals } from "../controllers/rentalControllers.js";
 
 const route = Router();
 
 route.post('/rentals', createRental);
+route.get('/rentals',getRentals)
 
 export default route;

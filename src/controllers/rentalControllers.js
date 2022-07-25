@@ -26,4 +26,15 @@ export async function createRental(req,res){
         console.log(error);
         res.status(500).send('deu ruim');   
     }
+};
+
+export async function getRentals(req,res){
+    try {
+        const data = await connection.query(`SELECT rentals.*, row_to_json(customers) AS customer, row_to_json(games) AS game 
+        FROM rentals JOIN customers ON rentals."customerId"=customers.id JOIN games ON rentals."gameId"=games.id;`);
+        res.send(data.rows);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("deu ruim");
+    }
 }
