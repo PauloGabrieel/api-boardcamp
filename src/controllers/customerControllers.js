@@ -53,5 +53,42 @@ export async function getCustomersById(req, res){
     } catch (error) {
         console.log(error);
         res.status(500).send('Houve um problema para buscar o cliente');
-    }
+    };
+
+    
 };
+
+export async function updateCustomerById(req, res){
+    try {
+        const customer = req.body;
+        const {id} = req.params;
+        
+        const customerId = await connection.query(`SELECT * FROM customers WHERE id='${id}'`);
+        const existingCustomer = customerId.rows.length !== 0;
+    
+        if(!existingCustomer){
+            return res.status(404).send('Cliente não existe');
+        };
+
+
+        const validation = customerValidation(customer);
+        if(validation.error){
+            const {details} = validation.error;
+            return res.status(400).send(details);
+        };
+        const {rows: cpf} = await connection.query(`SELECT cpf FROM customers WHERE cpf='${customer.cpf}'`)
+        
+        if(cpf.length === 1 && cpf[0].cpf != customerId.rows[0].cpf){
+            return res.status(409).send('cpf já existente');
+        };
+
+        await connection.query(`UPDATE customers 
+                                SET name='${customer.name}', phone='${customer.phone}', cpf='${customer.cpf}', birthday='${customer.birthday}'
+                                WHERE id='${id}';
+        `);
+        res.sendStatus(200);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Houve um problema para atualizar o cliente pelo id');
+    }
+}
